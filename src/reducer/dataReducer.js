@@ -1,8 +1,8 @@
 import { CONSTANTS } from "../action";
 
 const initialState = {
-  authenticated: false,
   data: "",
+  user: "",
   error: "",
   isLoaded: false,
 };
