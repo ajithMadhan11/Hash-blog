@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import Navbar from "./Core/Navbar";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Loader from "./Loader";
+import { auth } from "../firebase";
 
 const MainContainer = styled.div`
   display: flex;
   padding: 20px;
 `;
-
 const LeftForm = styled.div`
   height: 100vh;
   width: 55%;
@@ -23,7 +25,21 @@ const RightView = styled.div`
   border-radius: 13px;
 `;
 
-const Addpost = (props) => {
+const Addpost = React.memo(function Addpost(props) {
+  console.log(props);
+
+  const [user, loading, error] = useAuthState(auth);
+
+  useEffect(() => {
+    if (loading) {
+      console.log(loading);
+      return <Loader />;
+    }
+    if (user) {
+      console.log(user);
+    }
+  }, [user, loading]);
+
   return (
     <>
       <Navbar />
@@ -33,7 +49,7 @@ const Addpost = (props) => {
       </MainContainer>
     </>
   );
-};
+});
 
 const mapStateToProps = (state) => ({
   auth: state.auth,

@@ -2,8 +2,8 @@ import { CONSTANTS } from "../action";
 
 const initialState = {
   authenticated: false,
-  uid: '',
-  error: '',
+  uid: "",
+  error: "",
   isLoaded: false,
 };
 

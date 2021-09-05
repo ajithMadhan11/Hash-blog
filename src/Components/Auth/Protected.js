@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Redirect, Route } from "react-router-dom";
 import Loader from "../Loader";
 const Protected = ({ component: Component, auth, ...rest }) => {
+  const { isLoaded, authenticated } = auth;
   return (
     <Route
       {...rest}
       render={(props) =>
-        !auth.isLoaded ? (
+        !isLoaded ? (
           <Loader />
-        ) : auth.authenticated ? (
+        ) : authenticated ? (
           <Component {...props} />
         ) : (
           <Redirect to="/signin" />

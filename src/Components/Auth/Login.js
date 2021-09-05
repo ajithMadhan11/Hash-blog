@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../Core/Navbar";
@@ -7,7 +7,6 @@ import { connect } from "react-redux";
 import { authUser } from "../../action";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import App from "../../App";
 
 const MainConatainer = styled.div`
   background-color: #edf0f9;

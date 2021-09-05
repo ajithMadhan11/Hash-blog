@@ -7,6 +7,13 @@ import styled from "styled-components";
 import CategoryCards from "./Components/CategoryCards";
 import { Icon } from "@iconify/react";
 import { useHistory } from "react-router";
+import { useState, useEffect } from "react";
+import firebase from "firebase/app";
+import { connect } from "react-redux";
+import { authUser, hashdata } from "./action";
+import { database, auth } from "./firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import Loader from "./Components/Loader";
 
 const MainContainer = styled.div`
   background-color: #edf0f9;
@@ -45,12 +52,86 @@ const AddPostBtn = styled.button`
   }
 `;
 
-function App() {
+function App(props) {
+  const [user, loading, error] = useAuthState(auth);
+
   const history = useHistory();
   const categories = ["global", "tech", "food", "health", "fashion", "others"];
+  const [uid, setuid] = useState("");
+
+  // useEffect(() => {
+  //   firebase.auth().onAuthStateChanged((user) => {
+  //     if (user) {
+  //       setuid(user.uid);
+  //       props.dispatch(
+  //         authUser({
+  //           authenticated: true,
+  //           uid: user.uid,
+  //           error: "",
+  //           isLoaded: true,
+  //         })
+  //       );
+  //     } else {
+  //       props.dispatch(
+  //         authUser({
+  //           authenticated: false,
+  //           uid: "",
+  //           error: "",
+  //           isLoaded: false,
+  //         })
+  //       );
+  //     }
+  //   });
+  // }, []);
+  useEffect(() => {
+    if (loading) {
+      console.log(loading);
+      return <Loader />;
+    }
+    if (user) {
+      console.log(user);
+      setuid(user.uid);
+      props.dispatch(
+        authUser({
+          authenticated: true,
+          uid: user.uid,
+          error: "",
+          isLoaded: true,
+        })
+      );
+    }
+  }, [user, loading]);
+
+  useEffect(() => {
+    if (uid) {
+      const docRef = database.collection("users").doc(uid);
+      docRef
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            props.dispatch(
+              hashdata({
+                data: "",
+                user: doc.data(),
+                error: "",
+                isLoaded: true,
+              })
+            );
+          } else {
+            console.log("No such document!");
+          }
+        })
+        .catch((error) => {
+          console.log("Error getting document:", error);
+        });
+    }
+  }, [uid]);
+
   const addpost = () => {
     history.push("/add");
   };
+  console.log(props);
+
   return (
     <>
       <Navbar />
@@ -90,5 +171,8 @@ function App() {
     </>
   );
 }
-
-export default App;
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  data: state.data,
+});
+export default connect(mapStateToProps)(App);

@@ -4,11 +4,13 @@ import { Icon } from "@iconify/react";
 import Ajith from "../../img/ajith.jpeg";
 import firebase from "firebase/app";
 import { connect } from "react-redux";
-import { authUser, hashdata } from "../../action";
-import { ToastContainer, toast } from "react-toastify";
+import { authUser } from "../../action";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router";
-import { database } from "../../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../../firebase";
+import Loader from "../Loader";
 
 const NavbarConatainer = styled.div`
   width: 100%;
@@ -80,60 +82,25 @@ const LoginBtn = styled.p`
   }
 `;
 const Navbar = (props) => {
-  const [uid, setuid] = useState("");
   const history = useHistory();
+
+  const [user, loading, error] = useAuthState(auth);
+
   useEffect(() => {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setuid(user.uid);
-        props.dispatch(
-          authUser({
-            authenticated: true,
-            uid: user.uid,
-            error: "",
-            isLoaded: true,
-          })
-        );
-      } else {
-        props.dispatch(
-          authUser({
-            authenticated: false,
-            uid: "",
-            error: "",
-            isLoaded: false,
-          })
-        );
-      }
-    });
-  }, []);
-  useEffect(() => {
-    let unmounted = false;
-    if (uid) {
-      const docRef = database.collection("users").doc(uid);
-      docRef
-        .get()
-        .then((doc) => {
-          if (doc.exists) {
-            props.dispatch(
-              hashdata({
-                data: "",
-                user: doc.data(),
-                error: "",
-                isLoaded: true,
-              })
-            );
-          } else {
-            console.log("No such document!");
-          }
-        })
-        .catch((error) => {
-          console.log("Error getting document:", error);
-        });
+    if (loading) {
+      return;
     }
-    return () => {
-      unmounted = true;
-    };
-  }, [uid]);
+    if (user) {
+      props.dispatch(
+        authUser({
+          authenticated: true,
+          uid: user.uid,
+          error: "",
+          isLoaded: true,
+        })
+      );
+    }
+  }, [user, loading]);
 
   const signoutFromApp = () => {
     firebase
@@ -182,7 +149,7 @@ const Navbar = (props) => {
             <Icon icon="icon-park:github" width="25" height="25" />
           </IconConatainer>
         </SocialContainer>
-        {props.auth.authenticated && props.data.isLoaded ? (
+        {props.auth.authenticated ? (
           <>
             <IconConatainer onClick={signoutFromApp}>
               &nbsp;Logout

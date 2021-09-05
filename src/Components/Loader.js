@@ -2,7 +2,6 @@ import { useState } from "react";
 import { css } from "@emotion/react";
 import SyncLoader from "react-spinners/SyncLoader";
 
-
 const override = css`
   display: block;
   margin: 0 auto;
@@ -21,8 +20,7 @@ function Loader() {
 
   return (
     <div className="sweet-loading">
-      <SyncLoader
- color={color} loading={loading} css={override} size={30} />
+      <SyncLoader color={color} loading={loading} css={override} size={30} />
     </div>
   );
 }
