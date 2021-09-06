@@ -10,10 +10,11 @@ const app = {
   storageBucket: "hash-blog11.appspot.com",
   messagingSenderId: "89564991545",
   appId: "1:89564991545:web:57ab901ba2bc5ef0abfde8",
-  measurementId: "G-P1NDJLN9N0"
-  };
+  measurementId: "G-P1NDJLN9N0",
+};
 // Initialize Firebase
 const firebaseApp = firebase.initializeApp(app);
 const auth = firebase.auth();
 const database = firebase.firestore(firebaseApp);
+
 export { database, auth };

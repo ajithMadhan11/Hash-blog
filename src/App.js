@@ -59,30 +59,6 @@ function App(props) {
   const categories = ["global", "tech", "food", "health", "fashion", "others"];
   const [uid, setuid] = useState("");
 
-  // useEffect(() => {
-  //   firebase.auth().onAuthStateChanged((user) => {
-  //     if (user) {
-  //       setuid(user.uid);
-  //       props.dispatch(
-  //         authUser({
-  //           authenticated: true,
-  //           uid: user.uid,
-  //           error: "",
-  //           isLoaded: true,
-  //         })
-  //       );
-  //     } else {
-  //       props.dispatch(
-  //         authUser({
-  //           authenticated: false,
-  //           uid: "",
-  //           error: "",
-  //           isLoaded: false,
-  //         })
-  //       );
-  //     }
-  //   });
-  // }, []);
   useEffect(() => {
     if (loading) {
       console.log(loading);

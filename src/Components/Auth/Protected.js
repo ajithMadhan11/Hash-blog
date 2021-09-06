@@ -4,6 +4,9 @@ import { Redirect, Route } from "react-router-dom";
 import Loader from "../Loader";
 const Protected = ({ component: Component, auth, ...rest }) => {
   const { isLoaded, authenticated } = auth;
+
+  useEffect(() => {}, []);
+
   return (
     <Route
       {...rest}

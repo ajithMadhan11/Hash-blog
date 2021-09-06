@@ -8,9 +8,6 @@ import { authUser } from "../../action";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useHistory } from "react-router";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
-import Loader from "../Loader";
 
 const NavbarConatainer = styled.div`
   width: 100%;
@@ -83,24 +80,6 @@ const LoginBtn = styled.p`
 `;
 const Navbar = (props) => {
   const history = useHistory();
-
-  const [user, loading, error] = useAuthState(auth);
-
-  useEffect(() => {
-    if (loading) {
-      return;
-    }
-    if (user) {
-      props.dispatch(
-        authUser({
-          authenticated: true,
-          uid: user.uid,
-          error: "",
-          isLoaded: true,
-        })
-      );
-    }
-  }, [user, loading]);
 
   const signoutFromApp = () => {
     firebase
