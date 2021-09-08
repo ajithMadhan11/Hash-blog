@@ -27,9 +27,4 @@ const composeEnhancers =
 
 const store = createStore(persistedReducer, composeEnhancers());
 
-// export default () => {
-//     let store = createStore(persistedReducer)
-//     let persistor = persistStore(store)
-//     return { store, persistor }
-//   }
 export default store;
