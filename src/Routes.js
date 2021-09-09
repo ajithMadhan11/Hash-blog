@@ -6,6 +6,7 @@ import Login from "./Components/Auth/Login";
 import Signup from "./Components/Auth/Signup";
 import Notfound from "./Components/Notfound";
 import Protected from "./Components/Auth/Protected";
+import Demo from "./Components/Demo";
 
 const Routes = () => {
   return (
@@ -14,6 +15,7 @@ const Routes = () => {
         <Route path="/" exact component={App} />
         <Route path="/signin" exact component={Login} />
         <Route path="/signup" exact component={Signup} />
+        <Route path="/demo" exact component={Demo} />
         <Protected path="/add" exact component={Addpost} />
         <Route path="*" exact component={Notfound} />
       </Switch>

@@ -202,6 +202,7 @@ const Signup = (props) => {
           progress: undefined,
         });
       });
+    setbtnText("Signup");
   };
   return (
     <>

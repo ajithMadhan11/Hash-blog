@@ -4,10 +4,13 @@ import styled from "styled-components";
 import Navbar from "./Core/Navbar";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Loader from "./Loader";
-import { auth } from "../firebase";
+import { auth, storage, database } from "../firebase";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import defaultpic from "../img/default.png";
+import ReactHtmlParser from "react-html-parser";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const MainContainer = styled.div`
   display: flex;
@@ -150,13 +153,29 @@ const ViewTitle = styled.p`
   font-size: 18px;
   margin-top: 5px;
 `;
+const SubmitBtn = styled.button`
+  margin: 5px 20px 10px 20px;
+  height: 40px;
+  border: none;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #ec1971;
+  border-radius: 5px;
+  &:hover {
+    cursor: pointer;
+    color: #ec1971;
+    background-color: #cccccc;
+  }
+  @media (max-width: 768px) {
+    margin: 5px 5px 10px 5px;
+  }
+`;
 const Addpost = React.memo(function Addpost(props) {
-  console.log(props);
-
+  const [btntext, setbtntext] = useState("Add post");
   const [user, loading] = useAuthState(auth);
   const [state, setstate] = useState({
     image: "",
-    category: "",
+    category: "category",
     title: "",
     tempUrl: "",
     error: "",
@@ -166,9 +185,6 @@ const Addpost = React.memo(function Addpost(props) {
   useEffect(() => {
     if (loading) {
       return <Loader />;
-    }
-    if (user) {
-      console.log(user);
     }
   }, [user, loading]);
   const handleChange = (name) => (e) => {
@@ -189,6 +205,90 @@ const Addpost = React.memo(function Addpost(props) {
   const handleMarkup = (content) => {
     setmarkup(content);
   };
+
+  const addPostToFirebase = (e) => {
+    e.preventDefault();
+
+    if (title == "" || category == "" || markup == "" || image == "") {
+      return toast.error("Please fill all the fields", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+    setbtntext("Uploading image ...");
+
+    const uploadTask = storage.ref(`/images/${image.name}`).put(image);
+
+    //initiates the firebase side uploading
+    uploadTask.on(
+      "state_changed",
+      (snapShot) => {
+        //takes a snap shot of the process as it is happening
+        console.log(snapShot);
+      },
+      (err) => {
+        //catches the errors
+        toast.error(err, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      },
+      () => {
+        // gets the functions from storage refences the image storage in firebase by the children
+        // gets the download url then sets the image from firebase as the value for the imgUrl key:
+        storage
+          .ref("images")
+          .child(image.name)
+          .getDownloadURL()
+          .then((fireBaseUrl) => {
+            setbtntext("Saving post to Database ...");
+            database
+              .collection("posts")
+              .add({
+                c_uid: props.auth.uid,
+                title: title,
+                category: category,
+                markup: markup,
+                cover_image: fireBaseUrl,
+              })
+              .then(() => {
+                toast.success("Post added Successfully!", {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+                window.location.reload();
+              })
+              .catch((error) => {
+                toast.error(error, {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+              });
+          });
+      }
+    );
+  };
+
   return (
     <>
       <Navbar />
@@ -223,6 +323,7 @@ const Addpost = React.memo(function Addpost(props) {
             <QuillContainer>
               <ReactQuill onChange={handleMarkup} value={markup} />
             </QuillContainer>
+            <SubmitBtn onClick={addPostToFirebase}>{btntext}</SubmitBtn>
           </Formcontainer>
         </LeftForm>
         <RightView>
@@ -230,10 +331,22 @@ const Addpost = React.memo(function Addpost(props) {
             <ViewCoverimage src={tempUrl || defaultpic} />
             <ViewCategory>{category}</ViewCategory>
             {title && <ViewTitle>{title}</ViewTitle>}
-            <div></div>
+            <div>{ReactHtmlParser(markup)}</div>
           </ViewContainer>
         </RightView>
       </MainContainer>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <ToastContainer />
     </>
   );
 });
