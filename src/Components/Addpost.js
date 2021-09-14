@@ -260,6 +260,8 @@ const Addpost = React.memo(function Addpost(props) {
                 category: category,
                 markup: markup,
                 cover_image: fireBaseUrl,
+                likes: 0,
+                date: Date.now(),
               })
               .then(() => {
                 toast.success("Post added Successfully!", {

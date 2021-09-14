@@ -21,7 +21,7 @@ const MainContainer = styled.div`
   height: fit-content;
 `;
 const CardContainer = styled.div`
-  padding: 10px 20px 30px 50px;
+  padding: 10px 10px 30px 50px;
   display: flex;
   flex-wrap: wrap;
   @media (max-width: 720px) {
@@ -29,7 +29,7 @@ const CardContainer = styled.div`
   }
 `;
 const CategoryContainer = styled.div`
-  padding: 30px 90px 30px 90px;
+  padding: 30px 90px 10px 90px;
   display: flex;
   justify-content: space-evenly;
   @media (max-width: 720px) {
@@ -51,9 +51,28 @@ const AddPostBtn = styled.button`
     cursor: pointer;
   }
 `;
-
+const PageBtn = styled.button`
+  padding: 15px;
+  color: #ffffff;
+  background-color: #ec1971;
+  border: none;
+  margin-right: 10px;
+  border-radius: 10px;
+  width: 120px;
+  font-weight: bolder;
+  &:hover {
+    cursor: pointer;
+    background-color: #ed4289;
+  }
+`;
+const PageContainer = styled.div`
+  padding: 10px 80px 50px 80px;
+  display: flex;
+  justify-content: center;
+`;
 function App(props) {
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
+  const [feedCount, setfeedCount] = useState(6);
 
   const history = useHistory();
   const categories = ["global", "tech", "food", "health", "fashion", "others"];
@@ -81,6 +100,7 @@ function App(props) {
   useEffect(() => {
     if (uid) {
       const docRef = database.collection("users").doc(uid);
+
       docRef
         .get()
         .then((doc) => {
@@ -100,6 +120,17 @@ function App(props) {
         .catch((error) => {
           console.log("Error getting document:", error);
         });
+      database
+        .collection("posts")
+        .orderBy("date")
+        .limit(25)
+
+        .then((data) => {
+          console.log("FEED", data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }, [uid]);
 
@@ -118,6 +149,7 @@ function App(props) {
           ))}
         </CategoryContainer>
         <CardContainer>
+          <CardComponent />
           <CardComponent />
           <CardComponent />
           <CardComponent />
@@ -143,6 +175,10 @@ function App(props) {
             height="35"
           />
         </AddPostBtn>
+        <PageContainer>
+          <PageBtn>⮨ Previous</PageBtn>
+          <PageBtn>Next ⮫</PageBtn>
+        </PageContainer>
       </MainContainer>
     </>
   );
